@@ -1,3 +1,9 @@
+# keystore
+*keys.py
+
+# libs
+poetry.lock
+
 # virtual environment
 mi-env
 
