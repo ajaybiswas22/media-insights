@@ -1,3 +1,17 @@
+src/storage/*
+
+# keystore
+*keys.py
+
+# libs
+poetry.lock
+
+# virtual environment
+mi-env
+
+# Mac files
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

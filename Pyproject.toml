@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "media-insights"
+version = "0.1.0"
+description = "Provides insights on social media content"
+authors = ["Ajay Biswas"]
+license = "MIT"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pyspark = "^3.5.5"
+pydantic = "^2.11.1"
+flask = "^3.1.0"
+google-api-python-client = "^2.166.0"
+google-auth-oauthlib = "^1.2.1"
+google-auth-httplib2 = "0.2.0"
+hvac = "^2.3.0"
+jupyter = "^1.1.1"
+pandas = "^2.2.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
