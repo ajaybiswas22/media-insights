@@ -1,6 +1,8 @@
 import googleapiclient.discovery
 from googleapiclient.errors import HttpError
-
+import hvac
+import os
+from dotenv import load_dotenv
 class YoutubeClient:
     """
     A client for interacting with the YouTube Data API v3.
@@ -9,14 +11,21 @@ class YoutubeClient:
         search(part: str, query: str, max_result: int) -> dict:
             Searches YouTube for videos based on the query and returns the response.
     """
-    def __init__(self, developer_key):
+    def __init__(self):
         """
         Initializes the YouTube client with the provided developer key.
         
         :param developer_key: API key for authenticating requests to YouTube Data API.
         """
+        load_dotenv()
+        vault_addr = os.getenv("VAULT_ADDR", "http://vault:8200")
+        vault_token = os.getenv("VAULT_TOKEN", "root")
         try:
-            self.youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=developer_key)
+            self.vault_client = hvac.Client(url=vault_addr, token=vault_token)
+            secret = self.vault_client.secrets.kv.read_secret_version(path="data_ingestion")
+            print(secret)
+            api_key = secret["data"]["data"]["YOUTUBE_API_KEY"]
+            self.youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
         except Exception as e:
             print(f"Failed to initialize YouTube client: {e}")
             self.youtube = None

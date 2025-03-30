@@ -1,4 +1,6 @@
-src/storage/*
+src/minio/*
+src/airflow/logs/*
+src/airflow/plugins/*
 
 # keystore
 *keys.py
