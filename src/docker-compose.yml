@@ -26,10 +26,10 @@ x-airflow-common:
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/airflow/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -40,23 +40,45 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+
+  vault:
+    image: hashicorp/vault:1.19
+    container_name: vault
+    restart: always
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    volumes:
+      - ./utils:/app/utils
+    cap_add:
+      - IPC_LOCK  # Required for Vault
+    command: "vault server -dev"
+
+
   data_ingestion:
     build: ./data_ingestion
     container_name: data_ingestion
     depends_on:
-      - storage
+      - minio
+      - vault
     volumes:
       - ./data_ingestion:/app
+      - ./utils:/app/utils
 
   data_engineering:
     build: ./data_engineering
     container_name: data_engineering
     depends_on:
-      - storage
+      - minio
+      - vault
     environment:
       - SPARK_MASTER_HOST=spark-master
     volumes:
       - ./data_engineering:/app
+      - ./utils:/app/utils
 
   flask_app:
     build: ./flask_app
@@ -64,20 +86,27 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - storage
+      - minio
+      - vault
     volumes:
       - ./flask_app:/app
+      - ./utils:/app/utils
 
-  storage:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: storage
-    ports:
-      - "9870:9870"   # HDFS Web UI
-      - "9000:9000"   # HDFS Access
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio1
+    restart: unless-stopped
+    user: "${UID}:${GID}"  # Dynamically set user ID and group ID
     environment:
-      - CLUSTER_NAME=hadoop_cluster
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     volumes:
-      - ./storage:/hadoop/dfs/name
+      - ./minio/data:/data
+      - ./utils:/app/utils
+    command: server /data --console-address ":9001"
 
   postgres:
     image: postgres:13
@@ -276,3 +305,4 @@ services:
         condition: service_completed_successfully
 volumes:
   postgres-db-volume:
+  utils:
