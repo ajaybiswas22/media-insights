@@ -62,7 +62,11 @@ services:
 
 
   data_ingestion:
-    build: ./data_ingestion
+    build: 
+      context: ./data_ingestion
+      dockerfile: Dockerfile
+      tags:
+        - "data_ingestion:v1.0"
     container_name: data_ingestion
     restart: always
     depends_on:
@@ -75,7 +79,11 @@ services:
       - ./.env
 
   data_engineering:
-    build: ./data_engineering
+    build:
+      context: ./data_engineering
+      dockerfile: Dockerfile
+      tags:
+        - "data_engineering:v1.0"
     container_name: data_engineering
     restart: always
     depends_on:
@@ -90,7 +98,11 @@ services:
       - ./.env
 
   flask_app:
-    build: ./flask_app
+    build:
+      context: ./flask_app
+      dockerfile: Dockerfile
+      tags:
+        - "flask_app:v1.0"
     container_name: flask_app
     restart: always
     ports:
