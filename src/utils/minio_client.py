@@ -12,14 +12,10 @@ class MinioClient:
     Provides methods to upload JSON data directly to MinIO.
     """
 
-    def __init__(self,secure: bool = False):
+    def __init__(self,minio_endpoint,minio_access_key,minio_secret_key, secure: bool = False):
         """
         Initialize MinIO client with credentials fetched from Vault.
         """
-        load_dotenv()
-        minio_endpoint = os.getenv("MINIO_ENDPOINT","minio:9000")
-        minio_access_key = os.getenv("MINIO_ACCESS_KEY","minio")
-        minio_secret_key = os.getenv("MINIO_SECRET_KEY","minio")
 
         try:
 

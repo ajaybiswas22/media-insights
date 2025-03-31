@@ -1,6 +1,7 @@
 src/minio/*
 src/airflow/logs/*
 src/airflow/plugins/*
+src/vault/data/*
 
 # keystore
 *keys.py

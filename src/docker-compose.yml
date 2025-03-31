@@ -15,7 +15,7 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
@@ -45,32 +45,39 @@ services:
     image: hashicorp/vault:1.19
     container_name: vault
     restart: always
-    ports:
-      - "8200:8200"
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
-      VAULT_API_ADDR: "http://0.0.0.0:8200"
-      VAULT_ADDR: "http://127.0.0.1:8200"
     volumes:
-      - ./utils:/app/utils
+      - ./vault/config:/vault/config
+      - ./vault/data:/vault/data
+      - ./vault/policies:/vault/policies
+    ports:
+      - 8200:8200
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=root
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_API_ADDR=http://0.0.0.0:8200
+      - VAULT_ADDRESS=http://0.0.0.0:8200
     cap_add:
-      - IPC_LOCK  # Required for Vault
-    command: "vault server -dev"
+      - IPC_LOCK
+    command: vault server -config=/vault/config/config.hcl
 
 
   data_ingestion:
     build: ./data_ingestion
     container_name: data_ingestion
+    restart: always
     depends_on:
       - minio
       - vault
     volumes:
       - ./data_ingestion:/app
       - ./utils:/app/utils
+    env_file:
+      - ./.env
 
   data_engineering:
     build: ./data_engineering
     container_name: data_engineering
+    restart: always
     depends_on:
       - minio
       - vault
@@ -79,10 +86,13 @@ services:
     volumes:
       - ./data_engineering:/app
       - ./utils:/app/utils
+    env_file:
+      - ./.env
 
   flask_app:
     build: ./flask_app
     container_name: flask_app
+    restart: always
     ports:
       - "8000:8000"
     depends_on:
@@ -91,6 +101,8 @@ services:
     volumes:
       - ./flask_app:/app
       - ./utils:/app/utils
+    env_file:
+      - ./.env
 
   minio:
     image: quay.io/minio/minio
