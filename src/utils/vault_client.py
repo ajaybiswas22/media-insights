@@ -1,54 +1,34 @@
-import hvac
-import os
-from dotenv import load_dotenv
+import requests
+
 class VaultClient:
-    """
-    A client for interacting with HashiCorp Vault using HVAC.
-    
-    This class handles authentication using a Vault token and allows secure retrieval of secrets.
-    It supports self-signed certificates for secure connections.
-    """
-
-    def __init__(self):
+    def __init__(self, vault_addr: str, token: str):
         """
-        Initializes the Vault client with the required configuration.
+        Initializes the Vault client.
 
-        Environment Variables:
-        - VAULT_ADDR: The Vault server address (default: "https://vault:8200").
-        - VAULT_TOKEN: The authentication token for Vault.
-        - VAULT_CERT_PATH: Path to the self-signed certificate for SSL verification.
-
-        Raises:
-        - Exception: If authentication with Vault fails.
+        :param vault_addr: URL of the Vault server (e.g., "http://vault:8200")
+        :param token: Vault authentication token
         """
-        load_dotenv()
-        self.vault_addr = os.getenv("VAULT_ADDR", "https://vault:8200")
-        self.vault_token = os.getenv("VAULT_TOKEN")
+        self.vault_addr = vault_addr.rstrip("/")
+        self.token = token
+        self.headers = {
+            "X-Vault-Token": self.token,
+            "Content-Type": "application/json"
+        }
 
-        # Initialize Vault client with SSL verification
-        self.client = hvac.Client(
-            url=self.vault_addr,
-            token=self.vault_token
-        )
-
-        # Check authentication status
-        if not self.client.is_authenticated():
-            raise Exception("Failed to authenticate with Vault")
-
-    def read_secret(self, path: str, key: str):
+    def get_secret(self, secret_path: str, key: str, mount_point: str = "secret") -> str:
         """
-        Retrieve a secret from Vault.
-        :param path: Vault path (e.g., "secret/youtube_api")
-        :param key: Secret key to fetch (e.g., "api_key")
-        :return: Secret value or None if not found
-        """
-        response = self.client.secrets.kv.read_secret_version(path=path)
-        return response["data"]["data"].get(key) if response and "data" in response else None
+        Retrieves a specific key from a Vault KV v2 secret.
 
-# Test the Vault connection
-if __name__ == "__main__":
-    try:
-        vault_client = VaultClient()
-        print("Successfully connected to Vault!")
-    except Exception as e:
-        print(f"Vault connection failed: {e}")
+        :param secret_path: The path of the secret (e.g., "media_insights")
+        :param key: The specific key to retrieve (e.g., "YOUTUBE_API_KEY")
+        :param mount_point: The mount point of the KV store (default: "secret")
+        :return: The value of the requested key as a string
+        """
+        url = f"{self.vault_addr}/v1/{mount_point}/data/{secret_path}"
+        
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            return response.json().get("data", {}).get("data", {}).get(key, "")
+
+        response.raise_for_status()

@@ -64,6 +64,7 @@ services:
   data_ingestion:
     build: ./data_ingestion
     container_name: data_ingestion
+    restart: always
     depends_on:
       - minio
       - vault
@@ -76,6 +77,7 @@ services:
   data_engineering:
     build: ./data_engineering
     container_name: data_engineering
+    restart: always
     depends_on:
       - minio
       - vault
@@ -90,6 +92,7 @@ services:
   flask_app:
     build: ./flask_app
     container_name: flask_app
+    restart: always
     ports:
       - "8000:8000"
     depends_on:
