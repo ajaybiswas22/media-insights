@@ -20,16 +20,29 @@ poetry install
 ```
 
 # Running using Docker
+
+### Create self signed certificate for vault
 ```
 cd src
+```
+
+### Run docker
+```
 docker-compose build --no-cache
-docker-compose up -d
+
+docker exec -it vault vault operator init
+docker exec -it vault vault operator unseal <Unseal_Key_1>
+docker exec -it vault vault operator unseal <Unseal_Key_2>
+docker exec -it vault vault operator unseal <Unseal_Key_3>
+docker exec -it vault vault secrets enable -path=secret kv-v2
+docker exec -it vault vault kv put secret/media_insights YOUTUBE_API_KEY="YOUR_YOUTUBE_API_KEY"
+docker exec -it vault vault policy write media_insights-policy /vault/policies/media_insights-policy.hcl
+docker exec -it vault vault token create -policy=media_insights-policy
 ```
 
-```
-docker exec -it vault vault kv put secret/data_ingestion YOUTUBE_API_KEY="YOUR_YOUTUBE_API_KEY"
-```
 
+
+### Future diagrams
 ```mermaid
 graph TD;
     A-->B;
