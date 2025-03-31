@@ -13,8 +13,5 @@ RUN pip install --upgrade pip setuptools wheel
 # Install dependencies 
 RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH="${PYTHONPATH}:/app/utils"
- 
-# Copy the rest of the application code 
-COPY . . 
 
 CMD ["python3", "main.py"]
