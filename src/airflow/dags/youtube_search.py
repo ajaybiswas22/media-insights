@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.operators.bash import BashOperator
 from datetime import datetime
 
 default_args = {
@@ -9,26 +9,15 @@ default_args = {
 }
 
 with DAG(
-    "run_python_container",
+    "youtube_search",
     default_args=default_args,
     schedule_interval=None,  # Trigger manually or via API
     catchup=False,
 ) as dag:
 
-    run_youtube_search = DockerOperator(
-        task_id="youtube_search",
-        image="data_ingestion",  # Replace with your actual image name
-        api_version="auto",
-        auto_remove=True,  # Deletes the container after execution
-        command="python /app/main.py",  # Replace with your script path
-        docker_url="unix://var/run/docker.sock",
-        network_mode="bridge",
-        mount_tmp_dir=False,
-        mounts=[
-            "./app:/app",  # Mount code folder
-            "./app/utils:/app/utils",  # Mount utilities
-        ],
-        tty=True,
+    run_youtube_api = BashOperator(
+        task_id="youtube_ingest",
+        bash_command="docker exec data_ingestion python /app/youtube_ingest.py 2025-04-01"
     )
 
-    run_youtube_search
+    run_youtube_api
