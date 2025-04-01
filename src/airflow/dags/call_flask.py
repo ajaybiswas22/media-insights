@@ -1,5 +1,4 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from datetime import datetime
 
