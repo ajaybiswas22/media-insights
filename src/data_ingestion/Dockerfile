@@ -14,4 +14,4 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH="${PYTHONPATH}:/app/utils"
 
-CMD ["python3", "main.py"]
+CMD ["tail", "-f", "/dev/null"]

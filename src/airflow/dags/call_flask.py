@@ -1,5 +1,4 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from datetime import datetime
 
@@ -20,7 +19,7 @@ with DAG(
     call_flask_health = SimpleHttpOperator(
         task_id="call_flask_health",
         method="GET",
-        http_conn_id="flask_app:8000",
+        http_conn_id="flask_app",
         endpoint="health",
         response_check=lambda response: response.json()["status"] == "healthy",
         log_response=True,
