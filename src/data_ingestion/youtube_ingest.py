@@ -59,6 +59,7 @@ def perform_search(date: str, start_time: str, end_time: str) -> str:
             minio.upload_json("youtube", f"search_{region}_news_today_{date}.json", response, overwrite=True)
         except Exception:
             return "Error: upload to s3 failed"
+    return "success"
 
 if __name__ == "__main__":
     load_dotenv()

@@ -96,6 +96,10 @@ services:
       - ./utils:/app/utils
     env_file:
       - ./.env
+    ports:
+      - 4040:4040
+    stdin_open: true
+    tty: true
 
   flask_app:
     build:

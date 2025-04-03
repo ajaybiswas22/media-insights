@@ -8,7 +8,12 @@ COPY requirements.txt .
 
 RUN apk update && apk add --no-cache \
     musl-dev build-base gcc gfortran openblas-dev \
-    linux-headers
+    linux-headers \
+    openjdk11 tzdata curl unzip bash \
+    coreutils \
+    procps \
+    && rm -rf /var/cache/apk/*
+
 RUN pip install --upgrade pip setuptools wheel
  
 # Install dependencies 
