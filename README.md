@@ -36,6 +36,8 @@ docker exec -it vault vault operator unseal <Unseal_Key_2>
 docker exec -it vault vault operator unseal <Unseal_Key_3>
 docker exec -it vault vault secrets enable -path=secret kv-v2
 docker exec -it vault vault kv put secret/media_insights YOUTUBE_API_KEY="YOUR_YOUTUBE_API_KEY"
+docker exec -it vault vault kv put secret/media_insights MINIO_ACCESS_KEY="YOUR_MINIO_ACCESS_KEY"
+docker exec -it vault vault kv put secret/media_insights MINIO_SECRET_KEY="YOUR_MINIO_SECRET_KEY"
 docker exec -it vault vault kv get secret/media_insights
 docker exec -it vault vault policy write media_insights-policy /vault/policies/media_insights-policy.hcl
 docker exec -it vault vault token create -policy=media_insights-policy  # copy token and paste in .env
