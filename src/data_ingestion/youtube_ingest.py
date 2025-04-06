@@ -25,13 +25,13 @@ def perform_search(date: str, start_time: str, end_time: str) -> str:
     vault_token = os.getenv("VAULT_TOKEN")
     hvac_client = VaultClient(vault_addr=vault_address,token=vault_token)
     YOUTUBE_API_KEY = hvac_client.get_secret("media_insights", "YOUTUBE_API_KEY")
+    MINIO_ACCESS_KEY = hvac_client.get_secret("media_insights", "MINIO_ACCESS_KEY")
+    MINIO_SECRET_KEY = hvac_client.get_secret("media_insights", "MINIO_SECRET_KEY")
 
     minio_endpoint = os.getenv("MINIO_ENDPOINT","minio:9000")
-    minio_access_key = os.getenv("MINIO_ACCESS_KEY","minio")
-    minio_secret_key = os.getenv("MINIO_SECRET_KEY","minio")
     
     youtube = YoutubeClient(YOUTUBE_API_KEY)
-    minio = MinioClient(minio_endpoint=minio_endpoint, minio_access_key=minio_access_key, minio_secret_key=minio_secret_key)
+    minio = MinioClient(minio_endpoint=minio_endpoint, minio_access_key=MINIO_ACCESS_KEY, minio_secret_key=MINIO_SECRET_KEY)
 
     try:
         with open('metadata/region.json') as f:
@@ -57,8 +57,8 @@ def perform_search(date: str, start_time: str, end_time: str) -> str:
             return "Error: " + response['error']
         try:
             minio.upload_json("youtube", f"search_{region}_news_today_{date}.json", response, overwrite=True)
-        except Exception:
-            return "Error: upload to s3 failed"
+        except Exception as e:
+            return f"Error: upload to s3 failed {e}"
     return "success"
 
 if __name__ == "__main__":
