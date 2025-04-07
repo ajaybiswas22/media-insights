@@ -1,3 +1,5 @@
+# local files
+test.py
 src/minio/*
 src/airflow/logs/*
 src/airflow/plugins/*
