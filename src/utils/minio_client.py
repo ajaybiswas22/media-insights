@@ -175,4 +175,27 @@ class MinioClient:
         except json.JSONDecodeError:
             print("JSON Decode Error")
             return None
+    
+    def list_files(self, bucket, prefix="") -> list[str]:
+        """
+        List all files in a MinIO bucket.
+
+        Args:
+            bucket (str): Name of the bucket.
+            prefix (str, optional): Filter files with this prefix. Defaults to "".
+
+        Returns:
+            List[str]: List of object names (file paths).
+        """
+        if not self.minio.bucket_exists(bucket):
+            print(f"Bucket '{bucket}' does not exist.")
+            return []
+
+        try:
+            objects = self.minio.list_objects(bucket, prefix=prefix, recursive=True)
+            file_list = [obj.object_name for obj in objects]
+            return file_list
+        except S3Error as e:
+            print(f"Error while listing files: {e}")
+            return []
 

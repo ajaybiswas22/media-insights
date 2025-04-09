@@ -1,0 +1,7 @@
+pydantic==2.11.1
+hvac==2.3.0
+jupyter==1.1.1
+pandas==2.2.3
+minio==7.2.15
+python-dotenv==1.1.0
+requests==2.32.3

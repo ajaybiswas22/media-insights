@@ -4,6 +4,8 @@ src/minio/*
 src/airflow/logs/*
 src/airflow/plugins/*
 src/vault/data/*
+src/logs/*
+!src/logs/log4j.properties
 
 # keystore
 *keys.py
