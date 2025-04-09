@@ -1,3 +1,3 @@
 path "secret/data/media_insights" {
-  capabilities = ["read", "list"]
+  capabilities = ["create", "read", "update", "delete", "list"]
 }
