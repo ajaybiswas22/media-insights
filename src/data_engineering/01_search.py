@@ -20,6 +20,7 @@ def run_job(date: str) -> str:
     minio = MinioClient(minio_endpoint=minio_endpoint, minio_access_key=MINIO_ACCESS_KEY, minio_secret_key=MINIO_SECRET_KEY)
 
     spark = SparkSessionManager.get_spark_session("media_insights","spark://spark:7077","1g","2")
+    print(minio.list_files("youtube"))
     df = spark.createDataFrame([(1, "Alice"), (2, "Bob")], ["id", "name"])
     df.show()
     return "success"
