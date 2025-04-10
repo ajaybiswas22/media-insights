@@ -7,6 +7,7 @@ from minio.error import S3Error
 import datetime
 import hashlib
 import hmac
+import boto3
 
 class MinioClient:
     """
@@ -24,23 +25,23 @@ class MinioClient:
         Initialize MinioClient instance.
 
         Args:
-            minio_endpoint (str): MinIO endpoint e.g., "minio:9000"
-            minio_access_key (str): Access key for MinIO
-            minio_secret_key (str): Secret key for MinIO
+            endpoint (str): MinIO endpoint e.g., "minio:9000"
+            access_key (str): Access key for MinIO
+            secret_key (str): Secret key for MinIO
             region (str, optional): AWS region. Defaults to "us-east-1".
             secure (bool, optional): Use HTTPS if True. Defaults to False.
         """
-        self.minio_endpoint = minio_endpoint
-        self.minio_access_key = minio_access_key
-        self.minio_secret_key = minio_secret_key
+        self.endpoint = minio_endpoint
+        self.access_key = minio_access_key
+        self.secret_key = minio_secret_key
         self.region = region
         self.service = "s3"
 
         self.minio = Minio(
-            endpoint=minio_endpoint,
-            access_key=minio_access_key,
-            secret_key=minio_secret_key,
-            secure=secure
+            endpoint = self.endpoint,
+            access_key = self.access_key,
+            secret_key = self.secret_key,
+            secure = secure
         )
 
     def _generate_headers(self, method, uri):
@@ -70,7 +71,7 @@ class MinioClient:
         def sign(key, msg):
             return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
 
-        k_date = sign(('AWS4' + self.minio_secret_key).encode('utf-8'), date_stamp)
+        k_date = sign(('AWS4' + self.secret_key).encode('utf-8'), date_stamp)
         k_region = sign(k_date, self.region)
         k_service = sign(k_region, self.service)
         k_signing = sign(k_service, 'aws4_request')
@@ -78,7 +79,7 @@ class MinioClient:
         signature = hmac.new(k_signing, string_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
 
         authorization_header = (
-            f'{algorithm} Credential={self.minio_access_key}/{credential_scope}, '
+            f'{algorithm} Credential={self.access_key}/{credential_scope}, '
             f'SignedHeaders={signed_headers}, Signature={signature}'
         )
 
