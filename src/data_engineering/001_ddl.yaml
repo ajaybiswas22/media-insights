@@ -1,0 +1,55 @@
+youtube_search:
+  description: This table contains daily search results of a particular keyword for a country
+  schema:
+    kind:
+      type: string
+    etag:
+      type: string
+    id_kind:
+      type: string
+    id_videoId:
+      type: string
+    snippet_publishedAt:
+      type: string
+    snippet_channelId:
+      type: string
+    snippet_title:
+      type: string
+    snippet_description:
+      type: string
+    snippet_thumbnails_default_url:
+      type: string
+    snippet_thumbnails_default_width:
+      type: string
+    snippet_thumbnails_default_height:
+      type: string
+    snippet_thumbnails_medium_url:
+      type: string
+    snippet_thumbnails_medium_width:
+      type: string
+    snippet_thumbnails_medium_height:
+      type: string
+    snippet_thumbnails_high_url:
+      type: string
+    snippet_thumbnails_high_width:
+      type: string
+    snippet_thumbnails_high_height:
+      type: string
+    snippet_channelTitle:
+      type: string
+    snippet_liveBroadcastContent:
+      type: string
+    snippet_publishTime:
+      type: string
+    query:
+      type: string
+    country:
+      type: string
+    date:
+      type: date
+    file_name:
+      type: string
+    load_timestamp:
+      type: timestamp
+  partitionBy:
+    - country
