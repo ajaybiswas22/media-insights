@@ -7,7 +7,6 @@ from minio.error import S3Error
 import datetime
 import hashlib
 import hmac
-import boto3
 
 class MinioClient:
     """
