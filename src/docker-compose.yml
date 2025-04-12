@@ -145,7 +145,7 @@ services:
       - ./data_engineering:/opt/bitnami/spark/data_engineering
       - ./utils:/opt/bitnami/spark/utils
       - ./logs/spark-events:/opt/bitnami/spark/spark-events
-      - ./logs/log4j.properties:/opt/bitnami/spark/conf/log4j.properties
+      - ./data_engineering/log4j.properties:/opt/bitnami/spark/conf/log4j.properties
     env_file:
       - ./.env
 
@@ -159,7 +159,6 @@ services:
       - "18080:18080"
     volumes:
       - ./logs/spark-events:/opt/bitnami/spark/spark-events
-      - ./logs/log4j.properties:/opt/bitnami/spark/conf/log4j.properties
     networks:
       - bridge-network
     command: >
@@ -191,7 +190,6 @@ services:
       - ./data_engineering:/opt/bitnami/spark/data_engineering
       - ./utils:/opt/bitnami/spark/utils
       - ./logs/spark-events:/opt/bitnami/spark/spark-events
-      - ./logs/log4j.properties:/opt/bitnami/spark/conf/log4j.properties
     networks:
       - bridge-network
     restart: unless-stopped
