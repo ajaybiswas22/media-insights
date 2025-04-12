@@ -20,9 +20,10 @@ pandas = "^2.2.3"
 minio = "^7.2.15"
 python-dotenv = "^1.1.0"
 requests = "^2.32.3"
-apache-airflow = "^2.10.5"
+apache-airflow = "3.0.0rc2"
 apache-airflow-providers-docker = "^4.2.0"
 boto3 = "^1.37.0"
+delta-spark = "^3.3.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.0"

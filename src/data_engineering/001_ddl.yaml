@@ -41,8 +41,6 @@ youtube_search:
       type: string
     snippet_publishTime:
       type: string
-    query:
-      type: string
     country:
       type: string
     date:
