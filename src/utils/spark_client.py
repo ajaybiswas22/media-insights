@@ -13,9 +13,9 @@ class SparkSessionManager:
             .config("spark.executor.cores", executor_cores) \
             .config("spark.eventLog.enabled", "true") \
             .config("spark.eventLog.dir", "file:/opt/bitnami/spark/spark-events") \
-            .config("spark.hadoop.fs.s3a.access.key", storage_client.access_key) \
-            .config("spark.hadoop.fs.s3a.secret.key", storage_client.secret_key) \
-            .config("spark.hadoop.fs.s3a.endpoint", storage_client.endpoint) \
+            .config("spark.hadoop.fs.s3a.access.key", storage_client.get_access_key()) \
+            .config("spark.hadoop.fs.s3a.secret.key", storage_client.get_secret_key()) \
+            .config("spark.hadoop.fs.s3a.endpoint", storage_client.get_endpoint()) \
             .config("spark.hadoop.fs.s3a.path.style.access", "true") \
             .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false") \
             .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
