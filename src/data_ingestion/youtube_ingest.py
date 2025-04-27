@@ -1,6 +1,6 @@
 from utils.youtube_client import YoutubeClient
 from utils.vault_client import VaultClient
-from utils.minio_client import MinioClient
+from utils.storage_client import MinioClient
 import os
 import sys
 import json

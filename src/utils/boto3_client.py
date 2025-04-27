@@ -6,9 +6,9 @@ class Boto3Client:
         
         self._s3 = boto3.client(
             's3',
-            endpoint_url=f"http://{storage_client.endpoint}",
-            aws_access_key_id=storage_client.access_key,
-            aws_secret_access_key=storage_client.secret_key,
+            endpoint_url=f"http://{storage_client.get_endpoint()}",
+            aws_access_key_id=storage_client.get_access_key(),
+            aws_secret_access_key=storage_client.get_secret_key(),
         )
     
     def list_objects(self,bucket_name: str, prefix: str) -> dict:

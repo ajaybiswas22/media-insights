@@ -5,7 +5,7 @@ sys.path.append(glob.glob("/opt/bitnami/spark/python/lib/py4j-*-src.zip")[0])
 
 from utils.spark_client import SparkSessionManager
 from utils.vault_client import VaultClient
-from utils.minio_client import MinioClient
+from utils.storage_client import MinioClient
 from utils.file_client import InputOutputClient
 from utils.boto3_client import Boto3Client
 import os
@@ -55,8 +55,7 @@ def run_job(date: str = None) -> str:
     df_combined = reduce(lambda df1, df2: df1.unionByName(df2), df_list)
     df_combined.groupBy('country').count().show()
     target_bucket = 'delta-store'
-    df_combined.write.format("delta").mode("append").save(f"s3a://{target_bucket}/search_bronze")
-
+    df_combined.write.format("delta").mode("append").save(f"s3a://{target_bucket}/bronze_search_raw")
 
     return "success"
 

@@ -7,8 +7,23 @@ from minio.error import S3Error
 import datetime
 import hashlib
 import hmac
+from abc import ABC, abstractmethod
 
-class MinioClient:
+class StorageClient(ABC):
+    @abstractmethod
+    def get_access_key(self):
+        pass
+
+    @abstractmethod
+    def get_secret_key(self):
+        pass
+
+    @abstractmethod
+    def get_endpoint(self):
+        pass
+
+
+class MinioClient(StorageClient):
     """
     A client for interacting with a MinIO server.
 
@@ -30,18 +45,27 @@ class MinioClient:
             region (str, optional): AWS region. Defaults to "us-east-1".
             secure (bool, optional): Use HTTPS if True. Defaults to False.
         """
-        self.endpoint = minio_endpoint
-        self.access_key = minio_access_key
-        self.secret_key = minio_secret_key
-        self.region = region
-        self.service = "s3"
+        self._endpoint = minio_endpoint
+        self._access_key = minio_access_key
+        self._secret_key = minio_secret_key
+        self._region = region
+        self._service = "s3"
 
         self.minio = Minio(
-            endpoint = self.endpoint,
-            access_key = self.access_key,
-            secret_key = self.secret_key,
+            endpoint = self._endpoint,
+            access_key = self._access_key,
+            secret_key = self._secret_key,
             secure = secure
         )
+
+    def get_access_key(self):
+        return self._access_key
+
+    def get_secret_key(self):
+        return self._secret_key
+    
+    def get_endpoint(self):
+        return self._endpoint
 
     def _generate_headers(self, method, uri):
         """
@@ -64,21 +88,21 @@ class MinioClient:
 
         canonical_request = f'{method}\n{canonical_uri}\n\n{canonical_headers}\n{signed_headers}\n{payload_hash}'
         algorithm = 'AWS4-HMAC-SHA256'
-        credential_scope = f'{date_stamp}/{self.region}/{self.service}/aws4_request'
+        credential_scope = f'{date_stamp}/{self._region}/{self._service}/aws4_request'
         string_to_sign = f'{algorithm}\n{amz_date}\n{credential_scope}\n{hashlib.sha256(canonical_request.encode("utf-8")).hexdigest()}'
 
         def sign(key, msg):
             return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
 
-        k_date = sign(('AWS4' + self.secret_key).encode('utf-8'), date_stamp)
-        k_region = sign(k_date, self.region)
-        k_service = sign(k_region, self.service)
+        k_date = sign(('AWS4' + self._secret_key).encode('utf-8'), date_stamp)
+        k_region = sign(k_date, self._region)
+        k_service = sign(k_region, self._service)
         k_signing = sign(k_service, 'aws4_request')
 
         signature = hmac.new(k_signing, string_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
 
         authorization_header = (
-            f'{algorithm} Credential={self.access_key}/{credential_scope}, '
+            f'{algorithm} Credential={self._access_key}/{credential_scope}, '
             f'SignedHeaders={signed_headers}, Signature={signature}'
         )
 
@@ -96,7 +120,7 @@ class MinioClient:
         Prints:
             Health status of MinIO server.
         """
-        url = f'http://{self.minio_endpoint}/minio/health/ready'
+        url = f'http://{self._endpoint}/minio/health/ready'
         headers = self._generate_headers("GET", "/minio/health/ready")
 
         response = requests.get(url, headers=headers)

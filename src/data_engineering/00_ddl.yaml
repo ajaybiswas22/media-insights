@@ -1,5 +1,6 @@
 youtube_search:
   description: This table contains daily search results of a particular keyword for a country
+  location: s3a://delta-store/bronze_search_raw
   schema:
     kind:
       type: string
@@ -49,5 +50,3 @@ youtube_search:
       type: string
     load_timestamp:
       type: timestamp
-  partitionBy:
-    - country

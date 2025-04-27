@@ -9,7 +9,7 @@ class InputOutputClient(object):
         if isinstance(data, dict):
             items = []
             for k, v in data.items():
-                new_key = f"{parent_key}.{k}" if parent_key else k
+                new_key = f"{parent_key}_{k}" if parent_key else k
                 items.append(InputOutputClient.flatten_json(v, new_key))
             return [{k: v for d in item for k, v in d.items()} for item in itertools.product(*items)]
 
